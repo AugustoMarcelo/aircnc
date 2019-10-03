@@ -1,9 +1,10 @@
 import React, { useState, useMemo } from 'react';
+import api from '../../services/api';
 
 import camera from '../../assets/camera.svg';
 import './styles.css';
 
-export default function New() {
+export default function New({ history }) {
   const [data, setData] = useState({
     company: '',
     techs: '',
@@ -15,8 +16,22 @@ export default function New() {
     return data.thumbnail ? URL.createObjectURL(data.thumbnail) : null;
   }, [data.thumbnail])
   
-  function handleSubmit() {
+  async function handleSubmit(event) {
+    event.preventDefault();
 
+    const spotData = new FormData();
+    const user_id = localStorage.getItem('user');
+
+    spotData.append('thumbnail', data.thumbnail);
+    spotData.append('company', data.company);
+    spotData.append('techs', data.techs);
+    spotData.append('price', data.price);
+
+    await api.post('/spots', spotData, {
+      headers: { user_id }
+    });
+
+    history.push('/dashboard');
   }
 
   return (
